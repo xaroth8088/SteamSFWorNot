@@ -53,6 +53,7 @@
   "release-it": {
     "github": {
       "release": true,
+      "open": false,
       "autoGenerate": true,
       "assets": [
         "*.exe"
