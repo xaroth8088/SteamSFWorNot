@@ -10,7 +10,7 @@
     "clean": "rimraf dist",
     "build": "vite build",
     "build:electron": "yarn clean && electron-builder",
-    "release": "yarn build && release-it",
+    "release": "yarn build:electron && release-it",
     "lint": "eslint .",
     "preview": "vite preview"
   },
