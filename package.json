@@ -1,7 +1,7 @@
 {
   "name": "sfw_or_not",
   "private": true,
-  "version": "0.1.7",
+  "version": "0.1.8",
   "type": "module",
   "main": "electron-main.js",
   "scripts": {
@@ -56,7 +56,7 @@
       "web": false,
       "autoGenerate": true,
       "assets": [
-        "*.exe"
+        "dist/*.exe"
       ]
     }
   },
