@@ -43,5 +43,10 @@
   "linux": {
     "target": "AppImage"
   },
+  "release-it": {
+    "github": {
+      "release": true
+    }
+  },
   "packageManager": "yarn@4.7.0"
 }
