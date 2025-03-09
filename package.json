@@ -39,10 +39,5 @@
   "linux": {
     "target": "AppImage"
   },
-  "build": {
-    "asarUnpack": [
-      "start-vite.js"
-    ]
-  },
   "packageManager": "yarn@4.7.0"
 }

@@ -5,10 +5,8 @@ import http from 'http';
 async function startViteServer() {
   try {
     const server = await createServer({
-      server: {
-        port: 3000,
-        // Add any additional Vite options here if needed.
-      },
+      server: { port: 3000 }
+      // Additional Vite options if needed
     });
     await server.listen();
     console.log('Vite dev server running on port 3000');
@@ -19,14 +17,12 @@ async function startViteServer() {
 
 function waitForServer(url, callback) {
   const interval = setInterval(() => {
-    http
-      .get(url, () => {
-        clearInterval(interval);
-        callback();
-      })
-      .on('error', () => {
-        console.log('Waiting for Vite dev server to start...');
-      });
+    http.get(url, () => {
+      clearInterval(interval);
+      callback();
+    }).on('error', () => {
+      console.log('Waiting for Vite dev server to start...');
+    });
   }, 1000);
 }
 
@@ -44,7 +40,6 @@ function createWindow() {
 
 app.on('ready', async () => {
   await startViteServer();
-  // Optionally wait for the server to be reachable
   waitForServer('http://localhost:3000', createWindow);
 });
 
