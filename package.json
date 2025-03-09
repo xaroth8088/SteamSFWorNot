@@ -46,7 +46,8 @@
   "release-it": {
     "github": {
       "release": true,
-      "assets": "dist/*.exe"
+      "autoGenerate": true,
+      "assets": ["dist/*.exe"]
     }
   },
   "packageManager": "yarn@4.7.0"
