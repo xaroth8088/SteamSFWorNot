@@ -1,7 +1,7 @@
 {
   "name": "sfw_or_not",
   "private": true,
-  "version": "0.1.2",
+  "version": "0.1.3",
   "type": "module",
   "main": "electron-main.js",
   "scripts": {
@@ -47,7 +47,9 @@
     "github": {
       "release": true,
       "autoGenerate": true,
-      "assets": ["dist/*.exe"]
+      "assets": [
+        "dist/*.exe"
+      ]
     }
   },
   "packageManager": "yarn@4.7.0"
