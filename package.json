@@ -48,7 +48,7 @@
       "release": true,
       "autoGenerate": true,
       "assets": [
-        "dist/*.exe"
+        "*.exe"
       ]
     }
   },
