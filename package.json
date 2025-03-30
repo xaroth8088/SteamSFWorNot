@@ -7,10 +7,11 @@
   "scripts": {
     "dev": "vite",
     "clean": "rimraf dist",
-    "build": "vite build",
-    "release": "yarn build && release-it",
+    "build": "yarn clean && vite build",
+    "release": "yarn build && release-it && yarn deploy",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "react": "^19.1.0",
@@ -32,6 +33,7 @@
     "eslint-plugin-react": "^7.37.4",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",
+    "gh-pages": "^6.3.0",
     "jiti": "^2.4.2",
     "less": "^4.2.2",
     "lightningcss": "^1.29.3",
@@ -46,22 +48,6 @@
     "tsx": "^4.19.3",
     "vite": "^6.2.3",
     "yaml": "^2.7.1"
-  },
-  "mac": {
-    "target": "dmg"
-  },
-  "win": {
-    "target": "nsis"
-  },
-  "linux": {
-    "target": "AppImage"
-  },
-  "build": {
-    "productName": "sfw_or_not",
-    "win": {
-      "target": "nsis",
-      "artifactName": "${productName}-Setup.${ext}"
-    }
   },
   "release-it": {
     "github": {
