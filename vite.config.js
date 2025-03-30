@@ -10,4 +10,5 @@ export default defineConfig({
             interval: 100,
         },
     },
+    base: "/SteamSFWorNot/",
 })
