@@ -3,36 +3,49 @@
   "private": true,
   "version": "0.1.8",
   "type": "module",
-  "main": "electron-main.js",
+  "main": "src/main.js",
   "scripts": {
-    "app": "electron .",
     "dev": "vite",
     "clean": "rimraf dist",
     "build": "vite build",
-    "build:electron": "yarn clean && electron-builder",
-    "release": "yarn build:electron && release-it",
+    "release": "yarn build && release-it",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
   },
   "devDependencies": {
-    "@eslint/js": "^9.19.0",
-    "@types/react": "^19.0.8",
-    "@types/react-dom": "^19.0.3",
+    "@eslint/js": "^9.23.0",
+    "@types/eslint": "^9.6.1",
+    "@types/less": "^3.0.8",
+    "@types/node": "^22.13.14",
+    "@types/react": "^19.0.12",
+    "@types/react-dom": "^19.0.4",
+    "@types/sass": "^1.45.0",
+    "@types/stylus": "^0.48.43",
+    "@types/terser": "^3.12.0",
+    "@types/yaml": "^1.9.7",
     "@vitejs/plugin-react": "^4.3.4",
-    "electron": "^35.0.0",
-    "electron-builder": "^25.1.8",
-    "eslint": "^9.19.0",
+    "eslint": "^9.23.0",
     "eslint-plugin-react": "^7.37.4",
-    "eslint-plugin-react-hooks": "^5.0.0",
-    "eslint-plugin-react-refresh": "^0.4.18",
-    "globals": "^15.14.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.19",
+    "jiti": "^2.4.2",
+    "less": "^4.2.2",
+    "lightningcss": "^1.29.3",
+    "postcss": "^8.5.3",
     "release-it": "^18.1.2",
     "rimraf": "^6.0.1",
-    "vite": "^6.1.0"
+    "sass": "^1.86.0",
+    "sass-embedded": "^1.86.0",
+    "stylus": "^0.64.0",
+    "sugarss": "^5.0.0",
+    "terser": "^5.39.0",
+    "tsx": "^4.19.3",
+    "vite": "^6.2.3",
+    "yaml": "^2.7.1"
   },
   "mac": {
     "target": "dmg"
@@ -53,12 +66,9 @@
   "release-it": {
     "github": {
       "release": true,
-      "web": false,
-      "autoGenerate": true,
-      "assets": [
-        "dist/*.exe"
-      ]
+      "web": true,
+      "autoGenerate": true
     }
   },
-  "packageManager": "yarn@4.7.0"
+  "packageManager": "yarn@4.8.1"
 }

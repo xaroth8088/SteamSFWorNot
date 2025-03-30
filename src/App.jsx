@@ -26,9 +26,12 @@ function App() {
 
     // Helper function: fetch with exponential back-off
     const fetchWithExponentialBackoff = async (url, retries = 5, delay = 500) => {
+        const noCorsUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+
+
         for (let i = 0; i < retries; i++) {
             try {
-                const response = await fetch(url, {
+                const response = await fetch(noCorsUrl, {
                     method: 'GET',
                     credentials: 'omit'
                 })
@@ -72,10 +75,9 @@ function App() {
                 }
 
                 let queryString = new URLSearchParams(params).toString()
-                const nsfwResponse = await fetch(
-                    `/store/saleaction/ajaxgetsaledynamicappquery?${queryString}`
+                let data = await fetchWithExponentialBackoff(
+                    `https://store.steampowered.com/saleaction/ajaxgetsaledynamicappquery?${queryString}`
                 )
-                let data = await nsfwResponse.json()
                 const nsfwAppids = data.appids
 
                 // This gets ALL results
@@ -94,10 +96,9 @@ function App() {
                     start: "0"
                 }
                 queryString = new URLSearchParams(params).toString()
-                const sfwResponse = await fetch(
-                    `/store/saleaction/ajaxgetsaledynamicappquery?${queryString}`
+                data = await fetchWithExponentialBackoff(
+                    `https://store.steampowered.com/saleaction/ajaxgetsaledynamicappquery?${queryString}`
                 )
-                data = await sfwResponse.json()
                 const sfwAppids = data.appids
 
                 const apps = [...nsfwAppids, ...sfwAppids]
@@ -129,7 +130,7 @@ function App() {
         const randomIndex = Math.floor(Math.random() * apps.length)
         const appid = apps[randomIndex]
         try {
-            const url = `/store/api/appdetails/?appids=${appid}&filter=basic`
+            const url = `https://store.steampowered.com/api/appdetails/?appids=${appid}&filter=basic`
             console.log(`Fetching ${appid} app details...`)
             const data = await fetchWithExponentialBackoff(url)
 

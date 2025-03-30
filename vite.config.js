@@ -9,12 +9,5 @@ export default defineConfig({
             usePolling: true,
             interval: 100,
         },
-        proxy: {
-            '/store': {
-                target: 'https://store.steampowered.com',
-                changeOrigin: true,
-                rewrite: (path) => path.replace(/^\/store/, ''),
-            },
-        },
     },
 })
