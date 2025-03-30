@@ -1,7 +1,7 @@
 {
   "name": "sfw_or_not",
   "private": true,
-  "version": "0.1.8",
+  "version": "0.2.0",
   "type": "module",
   "main": "src/main.js",
   "scripts": {
