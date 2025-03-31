@@ -1,4 +1,6 @@
 import React, {useEffect, useState} from 'react'
+import Sidebar from "./Sidebar.jsx";
+import Scorebar from "./Scorebar.jsx";
 
 function App() {
     const [score, setScore] = useState(0)
@@ -7,28 +9,24 @@ function App() {
     const [loading, setLoading] = useState(true)
     // phases: "loading", "guess", "afterImage", "feedback", "gameover"
     const [phase, setPhase] = useState("loading")
-    const [feedback, setFeedback] = useState("")
+    const [scorebarState, setScorebarState] = useState("")
     const [showCapsule, setShowCapsule] = useState(false)
     const [descriptionRevealed, setDescriptionRevealed] = useState(false)
     const [error, setError] = useState("")
     // List of games correctly answered (most recent first)
     const [correctGames, setCorrectGames] = useState([])
 
-    // Helper function: sleep for a given number of milliseconds
+    // Helper functions…
     const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
-    // Helper function: HTML entity decode
     function decodeHtml(html) {
         const textarea = document.createElement('textarea')
         textarea.innerHTML = html
         return textarea.value
     }
 
-    // Helper function: fetch with exponential back-off
     const fetchWithExponentialBackoff = async (url, retries = 5, delay = 500) => {
-        const noCorsUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-
-
+        const noCorsUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
         for (let i = 0; i < retries; i++) {
             try {
                 const response = await fetch(noCorsUrl, {
@@ -49,11 +47,10 @@ function App() {
         }
     }
 
-    // Fetch and cache the full app list on mount
     useEffect(() => {
         async function fetchAppList() {
             try {
-                // This gets ONLY NSFW results
+                // Fetch NSFW and SFW app lists and then merge
                 let params = {
                     cc: "US",
                     flavor: "contenthub_all",
@@ -80,7 +77,6 @@ function App() {
                 )
                 const nsfwAppids = data.appids
 
-                // This gets ALL results
                 params = {
                     cc: "US",
                     flavor: "contenthub_all",
@@ -113,20 +109,17 @@ function App() {
         fetchAppList()
     }, [])
 
-    // Function to load a new game round
     const loadNewGame = async (apps = appList) => {
         if (!apps || apps.length === 0) {
             setError("No apps available.")
             return
         }
-        // Reset state for a new round
         setLoading(true)
         setShowCapsule(false)
         setDescriptionRevealed(false)
-        setFeedback("")
+        setScorebarState("")
         setPhase("guess")
 
-        // Randomly select an app from the list
         const randomIndex = Math.floor(Math.random() * apps.length)
         const appid = apps[randomIndex]
         try {
@@ -134,18 +127,10 @@ function App() {
             console.log(`Fetching ${appid} app details...`)
             const data = await fetchWithExponentialBackoff(url)
 
-            // If the data is missing, unsuccessful, or not a game, try another game
             if (!data[appid] || !data[appid].success || data[appid].data.type !== "game") {
                 await loadNewGame(apps)
                 return
             }
-
-            // Example mapping:
-            // 1: NudityOrSexualContent
-            // 2: FrequentViolenceOrGore
-            // 3: AdultOnlySexualContent
-            // 4: GratuitousNudityOrSexualContent
-            // 5: GeneralMatureContent
 
             const appData = data[appid].data
             let is_sfw = true
@@ -173,9 +158,6 @@ function App() {
         }
     }
 
-    // Handler for the "I don't know" button:
-    // In "guess" phase, it shows the capsule image and switches to "afterImage".
-    // In "afterImage" phase, if the description hasn't been revealed, it reveals it.
     const handleDontKnow = () => {
         if (phase === "guess") {
             setShowCapsule(true)
@@ -185,7 +167,6 @@ function App() {
         }
     }
 
-    // Handle answer for Yes/No buttons
     const handleAnswer = (answer) => {
         if (!currentGame) return
 
@@ -197,12 +178,10 @@ function App() {
         }
 
         if (!correct) {
-            // End the game on an incorrect answer.
-            setFeedback("Incorrect! Game Over!")
+            setScorebarState("incorrect")
             setPhase("gameover")
             return
         } else {
-            // Correct answer: update score and add the game to the sidebar list
             let points = 0
             if (phase === "guess") {
                 points = 10
@@ -210,47 +189,34 @@ function App() {
                 points = descriptionRevealed ? 1 : 5
             }
             setScore((prev) => prev + points)
-            setFeedback(`Correct! You gained ${points} points.`)
+            setScorebarState("correct")
             setPhase("feedback")
-            // Add current game to the list of correctly answered games (most recent at the top)
             setCorrectGames((prev) => [currentGame, ...prev])
         }
     }
 
-    // Start the next round (only available after a correct answer)
     const handleNextGame = async () => {
         await loadNewGame()
     }
 
-    // Restart game after game over, resetting score and sidebar list
     const handleRestartGame = async () => {
         setScore(0)
         setCorrectGames([])
         await loadNewGame()
     }
 
-    // Define styles for the sidebar and main content
-    const sidebarStyle = {
-        width: "200px",
-        maxHeight: "100vh",
-        overflowY: "auto",
-        borderRight: "1px solid #ccc",
-        padding: "1rem"
-    }
+    let mainContent;
+    let buttons;
 
-    const mainContentStyle = {
-        flex: 1,
-        padding: "1rem"
-    }
-
-    // Determine what to show in the main content area
-    let mainContent
     if (loading || !currentGame) {
-        mainContent = <div style={{textAlign: "center", marginTop: "2rem"}}>Loading...</div>
+        mainContent = (
+            <>
+                Loading...
+            </>
+        )
     } else if (phase === "gameover") {
         mainContent = (
-            <div style={{textAlign: "center", marginTop: "2rem"}}>
-                <h1>{feedback}</h1>
+            <>
                 <h2>Final Score: {score}</h2>
                 <h3>{currentGame.name}</h3>
                 {currentGame.capsule_image && (
@@ -263,22 +229,22 @@ function App() {
                             <img
                                 src={currentGame.capsule_image}
                                 alt="Capsule"
-                                style={{maxWidth: "300px", margin: "1rem"}}
+                                className="capsule-image"
                             />
                         </a>
                     </div>
                 )}
                 {currentGame.short_description && (
-                    <p style={{margin: "1rem"}}>{currentGame.short_description}</p>
+                    <p className="description">{currentGame.short_description}</p>
                 )}
-                <button onClick={handleRestartGame}>Restart Game</button>
-            </div>
-        )
+            </>
+        );
+        buttons = (
+            <button onClick={handleRestartGame}>Restart Game</button>
+        );
     } else if (phase === "feedback") {
         mainContent = (
-            <div style={{textAlign: "center", marginTop: "2rem"}}>
-                <h1>{feedback}</h1>
-                <h2>Score: {score}</h2>
+            <>
                 <h3>{currentGame.name}</h3>
                 {currentGame.capsule_image && (
                     <div>
@@ -290,23 +256,23 @@ function App() {
                             <img
                                 src={currentGame.capsule_image}
                                 alt="Capsule"
-                                style={{maxWidth: "300px", margin: "1rem"}}
+                                className="capsule-image"
                             />
                         </a>
                     </div>
                 )}
                 {currentGame.short_description && (
-                    <p style={{margin: "1rem"}}>{currentGame.short_description}</p>
+                    <p className="description">{currentGame.short_description}</p>
                 )}
-                <button onClick={handleNextGame}>Next Game</button>
-            </div>
-        )
+            </>
+        );
+        buttons = (
+            <button onClick={handleNextGame}>Next Game</button>
+        );
     } else {
         // phase "guess" or "afterImage"
         mainContent = (
-            <div style={{textAlign: "center", marginTop: "2rem"}}>
-                <h1>Is this game SFW?</h1>
-                <h2>Score: {score}</h2>
+            <>
                 <h3>{currentGame.name}</h3>
                 {showCapsule && currentGame.capsule_image && (
                     <div>
@@ -318,7 +284,7 @@ function App() {
                             <img
                                 src={currentGame.capsule_image}
                                 alt="Capsule"
-                                style={{maxWidth: "300px", margin: "1rem"}}
+                                className="capsule-image"
                             />
                         </a>
                     </div>
@@ -326,40 +292,29 @@ function App() {
                 {phase === "afterImage" &&
                     descriptionRevealed &&
                     currentGame.short_description && (
-                        <p style={{margin: "1rem"}}>{currentGame.short_description}</p>
+                        <p className="description">{currentGame.short_description}</p>
                     )}
-                <div style={{marginTop: "1rem"}}>
-                    <button onClick={() => handleAnswer("yes")}>Yes</button>
-                    <button onClick={() => handleAnswer("no")}>No</button>
-                    {(phase === "guess" ||
-                        (phase === "afterImage" && !descriptionRevealed)) && (
-                        <button onClick={handleDontKnow}>I don&#39;t know</button>
-                    )}
-                </div>
-            </div>
-        )
+            </>
+        );
+        buttons = (
+            <>
+                <button onClick={() => handleAnswer("yes")}>Yes</button>
+                <button onClick={() => handleAnswer("no")}>No</button>
+                {(phase === "guess" ||
+                    (phase === "afterImage" && !descriptionRevealed)) && (
+                    <button onClick={handleDontKnow}>I don&#39;t know</button>
+                )}
+            </>
+        );
     }
 
     return (
-        <div style={{display: "flex"}}>
-            {/* Sidebar with correctly answered games */}
-            <div style={sidebarStyle}>
-                {correctGames.map((game, index) => (
-                    <div key={index} style={{marginBottom: "1rem"}}>
-                        <a
-                            href={`https://store.steampowered.com/app/${game.appid}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            <img src={game.capsule_image} alt={game.name} style={{width: "100%"}}/>
-                        </a>
-                    </div>
-                ))}
-            </div>
-
-            {/* Main game content */}
-            <div style={mainContentStyle}>{mainContent}</div>
-        </div>
+        <>
+            <Sidebar correctGames={correctGames}/>
+            <Scorebar scorebarState={scorebarState} score={score} />
+            <div className="main-content">{mainContent}</div>
+            <div className="button-group">{buttons}</div>
+        </>
     )
 }
 
