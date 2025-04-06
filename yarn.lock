@@ -2297,6 +2297,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"dom-confetti@npm:0.2.2":
+  version: 0.2.2
+  resolution: "dom-confetti@npm:0.2.2"
+  checksum: 10c0/39831a8646df57b9efeba605b825c3edc39ff39e74de4595ecbbfc0dd35f07278a04df700629efc9cb27e56991004b3a27f5765669435509f5e8360b99b12c26
+  languageName: node
+  linkType: hard
+
 "dot-prop@npm:^9.0.0":
   version: 9.0.0
   resolution: "dot-prop@npm:9.0.0"
@@ -5405,6 +5412,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-dom-confetti@npm:^0.2.0":
+  version: 0.2.0
+  resolution: "react-dom-confetti@npm:0.2.0"
+  dependencies:
+    dom-confetti: "npm:0.2.2"
+  peerDependencies:
+    react: "*"
+  checksum: 10c0/0001bc4b42c776c13f94e626437b64acca25febdcff5ffb2f049f8e103a245d446eea028beb08433c177bdb7120b99f608bd02f8d5d5efc789e0719ecde7db23
+  languageName: node
+  linkType: hard
+
 "react-dom@npm:^19.1.0":
   version: 19.1.0
   resolution: "react-dom@npm:19.1.0"
@@ -6051,6 +6069,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"screenfull@npm:^6.0.2":
+  version: 6.0.2
+  resolution: "screenfull@npm:6.0.2"
+  checksum: 10c0/e4accdb10410aa506dc10b3aa55b05f96421da8559ca3594c44e2cb80174d3a01819ea2b0e815797e24843844599f27778daa69d53bdb007f6bbd77c94e50d0d
+  languageName: node
+  linkType: hard
+
 "semver@npm:7.6.3":
   version: 7.6.3
   resolution: "semver@npm:7.6.3"
@@ -6150,10 +6175,12 @@ __metadata:
     postcss: "npm:^8.5.3"
     react: "npm:^19.1.0"
     react-dom: "npm:^19.1.0"
+    react-dom-confetti: "npm:^0.2.0"
     release-it: "npm:^18.1.2"
     rimraf: "npm:^6.0.1"
     sass: "npm:^1.86.0"
     sass-embedded: "npm:^1.86.0"
+    screenfull: "npm:^6.0.2"
     stylus: "npm:^0.64.0"
     sugarss: "npm:^5.0.0"
     terser: "npm:^5.39.0"

@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react'
 import Sidebar from "./Sidebar.jsx";
 import Scorebar from "./Scorebar.jsx";
+import Confetti from 'react-dom-confetti';
 
 function App() {
     const [score, setScore] = useState(0)
@@ -15,6 +16,7 @@ function App() {
     const [error, setError] = useState("")
     // List of games correctly answered (most recent first)
     const [correctGames, setCorrectGames] = useState([])
+    const [isExploding, setIsExploding] = React.useState(false);
 
     // Helper functions…
     const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
@@ -192,10 +194,12 @@ function App() {
             setScorebarState("correct")
             setPhase("feedback")
             setCorrectGames((prev) => [currentGame, ...prev])
+            setIsExploding(true);
         }
     }
 
     const handleNextGame = async () => {
+        setIsExploding(false);
         await loadNewGame()
     }
 
@@ -311,8 +315,26 @@ function App() {
     return (
         <>
             <Sidebar correctGames={correctGames}/>
-            <Scorebar scorebarState={scorebarState} score={score} />
-            <div className="main-content">{mainContent}</div>
+            <Scorebar scorebarState={scorebarState} score={score}>
+                <div className="confetti-container">
+                    <Confetti active={isExploding} config={{
+                        angle: 90,
+                        spread: 360,
+                        startVelocity: 30,
+                        elementCount: 70,
+                        dragFriction: 0.12,
+                        duration: 3000,
+                        stagger: 3,
+                        width: "10px",
+                        height: "10px",
+                        perspective: "500px",
+                        colors: ["#a864fd", "#29cdff", "#78ff44", "#ff718d", "#fdff6a"]
+                    }}/>
+                </div>
+            </Scorebar>
+            <div className="main-content">
+                {mainContent}
+            </div>
             <div className="button-group">{buttons}</div>
         </>
     )

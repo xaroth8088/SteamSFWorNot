@@ -107,3 +107,28 @@ button {
 .scorebar.correct {
     background: #00ff00;
 }
+
+.confetti-container {
+    position: relative;
+    width: 1px;
+    left: 50%;
+}
+
+.fullscreen-button {
+    border: 0;
+    height: 1rem;
+    width: 1rem;
+    border-left: 1px solid;
+    text-align: center;
+    padding-top: 0;
+    padding-left: 1rem;
+    margin-left: 0;
+    margin-right: 1rem;
+    background: transparent;
+}
+
+.fullscreen-button img {
+    width: 1rem;
+    height: 0.8rem;
+    display: inline-block;
+}

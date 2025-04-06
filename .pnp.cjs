@@ -49,10 +49,12 @@ const RAW_RUNTIME_STATE =
           ["postcss", "npm:8.5.3"],\
           ["react", "npm:19.1.0"],\
           ["react-dom", "virtual:a0c4babd90f8099bbb4f80b9f3dd9987fc242ee60708a4a960dfa862e75b32f59f9856680646d9bda31919081f84734aa5bdd9c9660c2dd9095ad82f2de1b089#npm:19.1.0"],\
+          ["react-dom-confetti", "virtual:a0c4babd90f8099bbb4f80b9f3dd9987fc242ee60708a4a960dfa862e75b32f59f9856680646d9bda31919081f84734aa5bdd9c9660c2dd9095ad82f2de1b089#npm:0.2.0"],\
           ["release-it", "npm:18.1.2"],\
           ["rimraf", "npm:6.0.1"],\
           ["sass", "npm:1.86.0"],\
           ["sass-embedded", "npm:1.86.0"],\
+          ["screenfull", "npm:6.0.2"],\
           ["sfw_or_not", "workspace:."],\
           ["stylus", "npm:0.64.0"],\
           ["sugarss", "virtual:a0c4babd90f8099bbb4f80b9f3dd9987fc242ee60708a4a960dfa862e75b32f59f9856680646d9bda31919081f84734aa5bdd9c9660c2dd9095ad82f2de1b089#npm:5.0.0"],\
@@ -2889,6 +2891,15 @@ const RAW_RUNTIME_STATE =
         "packageDependencies": [\
           ["doctrine", "npm:2.1.0"],\
           ["esutils", "npm:2.0.3"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["dom-confetti", [\
+      ["npm:0.2.2", {\
+        "packageLocation": "../../../.yarn/berry/cache/dom-confetti-npm-0.2.2-47b097769d-10c0.zip/node_modules/dom-confetti/",\
+        "packageDependencies": [\
+          ["dom-confetti", "npm:0.2.2"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -6318,6 +6329,29 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["react-dom-confetti", [\
+      ["npm:0.2.0", {\
+        "packageLocation": "../../../.yarn/berry/cache/react-dom-confetti-npm-0.2.0-d5a142c397-10c0.zip/node_modules/react-dom-confetti/",\
+        "packageDependencies": [\
+          ["react-dom-confetti", "npm:0.2.0"]\
+        ],\
+        "linkType": "SOFT"\
+      }],\
+      ["virtual:a0c4babd90f8099bbb4f80b9f3dd9987fc242ee60708a4a960dfa862e75b32f59f9856680646d9bda31919081f84734aa5bdd9c9660c2dd9095ad82f2de1b089#npm:0.2.0", {\
+        "packageLocation": "./.yarn/__virtual__/react-dom-confetti-virtual-c495f1428f/4/.yarn/berry/cache/react-dom-confetti-npm-0.2.0-d5a142c397-10c0.zip/node_modules/react-dom-confetti/",\
+        "packageDependencies": [\
+          ["@types/react", "npm:19.0.12"],\
+          ["dom-confetti", "npm:0.2.2"],\
+          ["react", "npm:19.1.0"],\
+          ["react-dom-confetti", "virtual:a0c4babd90f8099bbb4f80b9f3dd9987fc242ee60708a4a960dfa862e75b32f59f9856680646d9bda31919081f84734aa5bdd9c9660c2dd9095ad82f2de1b089#npm:0.2.0"]\
+        ],\
+        "packagePeers": [\
+          "@types/react",\
+          "react"\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["react-is", [\
       ["npm:16.13.1", {\
         "packageLocation": "../../../.yarn/berry/cache/react-is-npm-16.13.1-a9b9382b4f-10c0.zip/node_modules/react-is/",\
@@ -6898,6 +6932,15 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["screenfull", [\
+      ["npm:6.0.2", {\
+        "packageLocation": "../../../.yarn/berry/cache/screenfull-npm-6.0.2-049d9bc25a-10c0.zip/node_modules/screenfull/",\
+        "packageDependencies": [\
+          ["screenfull", "npm:6.0.2"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["semver", [\
       ["npm:5.7.2", {\
         "packageLocation": "../../../.yarn/berry/cache/semver-npm-5.7.2-938ee91eaa-10c0.zip/node_modules/semver/",\
@@ -6994,10 +7037,12 @@ const RAW_RUNTIME_STATE =
           ["postcss", "npm:8.5.3"],\
           ["react", "npm:19.1.0"],\
           ["react-dom", "virtual:a0c4babd90f8099bbb4f80b9f3dd9987fc242ee60708a4a960dfa862e75b32f59f9856680646d9bda31919081f84734aa5bdd9c9660c2dd9095ad82f2de1b089#npm:19.1.0"],\
+          ["react-dom-confetti", "virtual:a0c4babd90f8099bbb4f80b9f3dd9987fc242ee60708a4a960dfa862e75b32f59f9856680646d9bda31919081f84734aa5bdd9c9660c2dd9095ad82f2de1b089#npm:0.2.0"],\
           ["release-it", "npm:18.1.2"],\
           ["rimraf", "npm:6.0.1"],\
           ["sass", "npm:1.86.0"],\
           ["sass-embedded", "npm:1.86.0"],\
+          ["screenfull", "npm:6.0.2"],\
           ["sfw_or_not", "workspace:."],\
           ["stylus", "npm:0.64.0"],\
           ["sugarss", "virtual:a0c4babd90f8099bbb4f80b9f3dd9987fc242ee60708a4a960dfa862e75b32f59f9856680646d9bda31919081f84734aa5bdd9c9660c2dd9095ad82f2de1b089#npm:5.0.0"],\
