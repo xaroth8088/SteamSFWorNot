@@ -302,8 +302,8 @@ function App() {
         );
         buttons = (
             <>
-                <button onClick={() => handleAnswer("yes")}>Yes</button>
-                <button onClick={() => handleAnswer("no")}>No</button>
+                <button onClick={() => handleAnswer("yes")}>SAFE</button>
+                <button onClick={() => handleAnswer("no")}>NSFW</button>
                 {(phase === "guess" ||
                     (phase === "afterImage" && !descriptionRevealed)) && (
                     <button onClick={handleDontKnow}>I don&#39;t know</button>
