@@ -28,7 +28,7 @@ function App() {
     }
 
     const fetchWithExponentialBackoff = async (url, retries = 5, delay = 500) => {
-        const noCorsUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
+        const noCorsUrl = `https://steam-proxy.xaroth-733.workers.dev/${url}`
         for (let i = 0; i < retries; i++) {
             try {
                 const response = await fetch(noCorsUrl, {
@@ -75,7 +75,7 @@ function App() {
 
                 let queryString = new URLSearchParams(params).toString()
                 let data = await fetchWithExponentialBackoff(
-                    `https://store.steampowered.com/saleaction/ajaxgetsaledynamicappquery?${queryString}`
+                    `saleaction/ajaxgetsaledynamicappquery?${queryString}`
                 )
                 const nsfwAppids = data.appids
 
@@ -95,7 +95,7 @@ function App() {
                 }
                 queryString = new URLSearchParams(params).toString()
                 data = await fetchWithExponentialBackoff(
-                    `https://store.steampowered.com/saleaction/ajaxgetsaledynamicappquery?${queryString}`
+                    `saleaction/ajaxgetsaledynamicappquery?${queryString}`
                 )
                 const sfwAppids = data.appids
 
@@ -125,7 +125,7 @@ function App() {
         const randomIndex = Math.floor(Math.random() * apps.length)
         const appid = apps[randomIndex]
         try {
-            const url = `https://store.steampowered.com/api/appdetails/?appids=${appid}&filter=basic`
+            const url = `api/appdetails/?appids=${appid}&filter=basic`
             console.log(`Fetching ${appid} app details...`)
             const data = await fetchWithExponentialBackoff(url)
 
