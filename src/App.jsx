@@ -6,6 +6,7 @@ import Confetti from 'react-dom-confetti';
 function App() {
     const [score, setScore] = useState(0)
     const [appList, setAppList] = useState(null)
+    const [loadedCounts, setLoadedCounts] = useState({sfw: 0, nsfw: 0})
     const [currentGame, setCurrentGame] = useState(null)
     const [loading, setLoading] = useState(true)
     // phases: "loading", "guess", "afterImage", "feedback", "gameover"
@@ -100,6 +101,10 @@ function App() {
                 const sfwAppids = data.appids
 
                 const apps = [...nsfwAppids, ...sfwAppids]
+                setLoadedCounts({
+                    sfw: sfwAppids.length,
+                    nsfw: nsfwAppids.length
+                })
                 setAppList(apps)
                 await loadNewGame(apps)
             } catch (err) {
@@ -315,7 +320,11 @@ function App() {
     return (
         <>
             <Sidebar correctGames={correctGames}/>
-            <Scorebar scorebarState={scorebarState} score={score}>
+            <Scorebar
+                scorebarState={scorebarState}
+                score={score}
+                loadedCounts={loadedCounts}
+            >
                 <div className="confetti-container">
                     <Confetti active={isExploding} config={{
                         angle: 90,

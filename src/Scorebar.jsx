@@ -7,7 +7,7 @@ function switchToFullscreen() {
 	}
 }
 
-export default function Scorebar({scorebarState, score, children}) {
+export default function Scorebar({scorebarState, score, loadedCounts, children}) {
     const styles = ["scorebar"];
 
     let text = "Is this game SFW?";
@@ -25,7 +25,10 @@ export default function Scorebar({scorebarState, score, children}) {
     return (
         <div className={styles.join(" ")}>
             <div className="scorebar-text">
-                {text}
+                <div className="scorebar-title">{text}</div>
+                <div className="scorebar-loaded">
+                    Loaded: {loadedCounts.sfw} SFW / {loadedCounts.nsfw} NSFW
+                </div>
                 {children}
             </div>
             <div className="scorebar-score">

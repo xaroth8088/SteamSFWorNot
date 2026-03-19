@@ -30,7 +30,7 @@ h3 {
     "sidebar main"
     "sidebar footer";
     grid-template-columns: 1fr 3fr;
-    grid-template-rows: 1rem 1fr 20vh;
+    grid-template-rows: 2.75rem 1fr 20vh;
 }
 
 button {
@@ -81,9 +81,9 @@ button {
 
 .scorebar {
     grid-area: scorebar;
-    font-size: 0.5rem;
-    line-height: 1rem;
-    height: 1rem;
+    font-size: 0.75rem;
+    line-height: 1.2;
+    min-height: 2.75rem;
     display: flex;
     border-bottom: 1px solid black;
     align-items: center;
@@ -94,10 +94,19 @@ button {
     flex: 1;
 }
 
+.scorebar-title {
+    font-weight: 600;
+}
+
+.scorebar-loaded {
+    font-size: 0.7rem;
+}
+
 .scorebar-score {
     border-left: 1px solid black;
     padding: 0 1rem;
     text-align: right;
+    white-space: nowrap;
 }
 
 .scorebar.incorrect {
@@ -116,14 +125,12 @@ button {
 
 .fullscreen-button {
     border: 0;
-    height: 1rem;
-    width: 1rem;
+    height: 2.75rem;
+    width: 2.75rem;
     border-left: 1px solid;
     text-align: center;
-    padding-top: 0;
-    padding-left: 1rem;
-    margin-left: 0;
-    margin-right: 1rem;
+    padding: 0;
+    margin: 0;
     background: transparent;
 }
 
