@@ -18,6 +18,7 @@ function App() {
     // List of games correctly answered (most recent first)
     const [correctGames, setCorrectGames] = useState([])
     const [isExploding, setIsExploding] = React.useState(false);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
     // Helper functions…
     const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
@@ -205,31 +206,46 @@ function App() {
 
     const handleNextGame = async () => {
         setIsExploding(false);
+        setIsSidebarOpen(false)
         await loadNewGame()
     }
 
     const handleRestartGame = async () => {
         setScore(0)
         setCorrectGames([])
+        setIsSidebarOpen(false)
         await loadNewGame()
     }
 
     let mainContent;
     let buttons;
+    let panelClassName = "main-panel";
+    let panelEyebrow = "Current Round";
+    let panelTitle = "Classify This Game";
+    let panelSubtitle = "Decide if the game is safe for work. Use hints only if you need them.";
 
     if (loading || !currentGame) {
+        panelClassName += " is-loading";
+        panelEyebrow = "Loading";
+        panelTitle = "Preparing a New Round";
+        panelSubtitle = "Pulling a random Steam game and checking its details.";
         mainContent = (
-            <>
-                Loading...
-            </>
+            <div className="content-placeholder">
+                <div className="placeholder-orb" aria-hidden="true"></div>
+                <p className="placeholder-copy">Loading...</p>
+            </div>
         )
     } else if (phase === "gameover") {
+        panelClassName += " is-result";
+        panelEyebrow = "Round Complete";
+        panelTitle = "Game Over";
+        panelSubtitle = "The correct title and store art are now revealed.";
         mainContent = (
             <>
                 <h2>Final Score: {score}</h2>
-                <h3>{currentGame.name}</h3>
+                <h3 className="game-title">{currentGame.name}</h3>
                 {currentGame.capsule_image && (
-                    <div>
+                    <div className="capsule-frame">
                         <a
                             href={`https://store.steampowered.com/app/${currentGame.appid}`}
                             target="_blank"
@@ -252,11 +268,15 @@ function App() {
             <button onClick={handleRestartGame}>Restart Game</button>
         );
     } else if (phase === "feedback") {
+        panelClassName += " is-result";
+        panelEyebrow = "Correct";
+        panelTitle = "Nice Call";
+        panelSubtitle = "The game details are visible before you move to the next round.";
         mainContent = (
             <>
-                <h3>{currentGame.name}</h3>
+                <h3 className="game-title">{currentGame.name}</h3>
                 {currentGame.capsule_image && (
-                    <div>
+                    <div className="capsule-frame">
                         <a
                             href={`https://store.steampowered.com/app/${currentGame.appid}`}
                             target="_blank"
@@ -280,11 +300,29 @@ function App() {
         );
     } else {
         // phase "guess" or "afterImage"
+        panelClassName += " is-guessing";
+        panelEyebrow = phase === "afterImage" ? "Hint Revealed" : "Name Only";
+        panelTitle = currentGame.name;
+        panelSubtitle =
+            phase === "afterImage"
+                ? (descriptionRevealed
+                    ? "The store description is now visible."
+                    : "The store capsule is visible.")
+                : "Make your call from the title alone, or ask for a hint.";
         mainContent = (
             <>
-                <h3>{currentGame.name}</h3>
+                {!showCapsule && (
+                    <div className="content-placeholder content-placeholder-quiet">
+                        <div className="placeholder-card" aria-hidden="true">
+                            <span></span>
+                        </div>
+                        <p className="placeholder-copy">
+                            Capsule art stays hidden until you ask for a hint.
+                        </p>
+                    </div>
+                )}
                 {showCapsule && currentGame.capsule_image && (
-                    <div>
+                    <div className="capsule-frame">
                         <a
                             href={`https://store.steampowered.com/app/${currentGame.appid}`}
                             target="_blank"
@@ -307,11 +345,11 @@ function App() {
         );
         buttons = (
             <>
-                <button onClick={() => handleAnswer("yes")}>SAFE</button>
-                <button onClick={() => handleAnswer("no")}>NSFW</button>
+                <button className="answer-button" onClick={() => handleAnswer("yes")}>SAFE</button>
+                <button className="answer-button" onClick={() => handleAnswer("no")}>NSFW</button>
                 {(phase === "guess" ||
                     (phase === "afterImage" && !descriptionRevealed)) && (
-                    <button onClick={handleDontKnow}>I don&#39;t know</button>
+                    <button className="hint-button" onClick={handleDontKnow}>I don&#39;t know</button>
                 )}
             </>
         );
@@ -319,7 +357,12 @@ function App() {
 
     return (
         <>
-            <Sidebar correctGames={correctGames}/>
+            <Sidebar
+                correctGames={correctGames}
+                isOpen={isSidebarOpen}
+                onToggle={() => setIsSidebarOpen((prev) => !prev)}
+                onClose={() => setIsSidebarOpen(false)}
+            />
             <Scorebar
                 scorebarState={scorebarState}
                 score={score}
@@ -342,7 +385,18 @@ function App() {
                 </div>
             </Scorebar>
             <div className="main-content">
-                {mainContent}
+                <section className="main-stage">
+                    <div className={panelClassName}>
+                        <div className="panel-header">
+                            <p className="panel-eyebrow">{panelEyebrow}</p>
+                            <h1 className="panel-title">{panelTitle}</h1>
+                            <p className="panel-subtitle">{panelSubtitle}</p>
+                        </div>
+                        <div className="panel-body">
+                            {mainContent}
+                        </div>
+                    </div>
+                </section>
             </div>
             <div className="button-group">{buttons}</div>
         </>
