@@ -309,8 +309,11 @@ button:focus-visible {
 
 .description {
     width: min(100%, 42rem);
+    height: 100%;
     margin: 0;
     padding: 1rem 1.1rem;
+    box-sizing: border-box;
+    overflow-y: auto;
     border-radius: 18px;
     background: rgba(242, 247, 251, 0.9);
     border: 1px solid rgba(27, 56, 87, 0.08);
@@ -321,14 +324,14 @@ button:focus-visible {
 
 .description-slot {
     width: min(100%, 42rem);
-    min-height: 7.1rem;
+    height: 10.4rem;
     display: grid;
     align-items: start;
 }
 
 .description-muted,
 .description-empty {
-    min-height: 7.1rem;
+    height: 100%;
 }
 
 .description-muted {
@@ -605,6 +608,7 @@ button:focus-visible {
     .sidebar-scrim {
         position: fixed;
         inset: 0;
+        max-width: none;
         border: 0;
         margin: 0;
         padding: 0;
@@ -630,7 +634,9 @@ button:focus-visible {
     }
 
     .button-group {
-        padding-bottom: 5.75rem;
+        padding-bottom: 5rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
     }
 
     .main-panel {
