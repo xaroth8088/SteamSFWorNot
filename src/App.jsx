@@ -3,6 +3,114 @@ import Sidebar from "./Sidebar.jsx";
 import Scorebar from "./Scorebar.jsx";
 import Confetti from 'react-dom-confetti';
 
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+
+function decodeHtml(html) {
+    const textarea = document.createElement('textarea')
+    textarea.innerHTML = html
+    return textarea.value
+}
+
+async function fetchWithExponentialBackoff(url, retries = 5, delay = 500) {
+    const noCorsUrl = `https://steam-proxy.xaroth-733.workers.dev/${url}`
+    for (let i = 0; i < retries; i++) {
+        try {
+            const response = await fetch(noCorsUrl, {
+                method: 'GET',
+                credentials: 'omit'
+            })
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`)
+            }
+            return await response.json()
+        } catch (err) {
+            if (i === retries - 1) {
+                throw err
+            }
+            await sleep(delay)
+            delay *= 2
+        }
+    }
+}
+
+async function loadRandomGame({
+    apps,
+    setCurrentGame,
+    setDescriptionRevealed,
+    setError,
+    setLoading,
+    setPhase,
+    setScorebarState,
+    setShowCapsule,
+}) {
+    if (!apps || apps.length === 0) {
+        setError("No apps available.")
+        return
+    }
+
+    setLoading(true)
+    setShowCapsule(false)
+    setDescriptionRevealed(false)
+    setScorebarState("")
+    setPhase("guess")
+
+    const randomIndex = Math.floor(Math.random() * apps.length)
+    const appid = apps[randomIndex]
+
+    try {
+        const url = `api/appdetails/?appids=${appid}&filter=basic`
+        console.log(`Fetching ${appid} app details...`)
+        const data = await fetchWithExponentialBackoff(url)
+
+        if (!data[appid] || !data[appid].success || data[appid].data.type !== "game") {
+            await loadRandomGame({
+                apps,
+                setCurrentGame,
+                setDescriptionRevealed,
+                setError,
+                setLoading,
+                setPhase,
+                setScorebarState,
+                setShowCapsule,
+            })
+            return
+        }
+
+        const appData = data[appid].data
+        let is_sfw = true
+        if (appData.content_descriptors && appData.content_descriptors.ids) {
+            console.log(`Content descriptors: ${appData.content_descriptors.ids}`)
+            if (
+                appData.content_descriptors.ids.includes(1) ||
+                appData.content_descriptors.ids.includes(3) ||
+                appData.content_descriptors.ids.includes(4)
+            ) {
+                is_sfw = false
+            }
+        }
+        setCurrentGame({
+            appid,
+            name: appData.name,
+            capsule_image: appData.capsule_image,
+            short_description: decodeHtml(appData.short_description),
+            is_sfw
+        })
+        setLoading(false)
+    } catch (err) {
+        console.error("Error fetching app details after retries:", err)
+        await loadRandomGame({
+            apps,
+            setCurrentGame,
+            setDescriptionRevealed,
+            setError,
+            setLoading,
+            setPhase,
+            setScorebarState,
+            setShowCapsule,
+        })
+    }
+}
+
 function App() {
     const [score, setScore] = useState(0)
     const [appList, setAppList] = useState(null)
@@ -14,42 +122,11 @@ function App() {
     const [scorebarState, setScorebarState] = useState("")
     const [showCapsule, setShowCapsule] = useState(false)
     const [descriptionRevealed, setDescriptionRevealed] = useState(false)
-    const [error, setError] = useState("")
+    const [, setError] = useState("")
     // List of games correctly answered (most recent first)
     const [correctGames, setCorrectGames] = useState([])
     const [isExploding, setIsExploding] = React.useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false)
-
-    // Helper functions…
-    const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
-
-    function decodeHtml(html) {
-        const textarea = document.createElement('textarea')
-        textarea.innerHTML = html
-        return textarea.value
-    }
-
-    const fetchWithExponentialBackoff = async (url, retries = 5, delay = 500) => {
-        const noCorsUrl = `https://steam-proxy.xaroth-733.workers.dev/${url}`
-        for (let i = 0; i < retries; i++) {
-            try {
-                const response = await fetch(noCorsUrl, {
-                    method: 'GET',
-                    credentials: 'omit'
-                })
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`)
-                }
-                return await response.json()
-            } catch (err) {
-                if (i === retries - 1) {
-                    throw err
-                }
-                await sleep(delay)
-                delay *= 2
-            }
-        }
-    }
 
     useEffect(() => {
         async function fetchAppList() {
@@ -107,7 +184,16 @@ function App() {
                     nsfw: nsfwAppids.length
                 })
                 setAppList(apps)
-                await loadNewGame(apps)
+                await loadRandomGame({
+                    apps,
+                    setCurrentGame,
+                    setDescriptionRevealed,
+                    setError,
+                    setLoading,
+                    setPhase,
+                    setScorebarState,
+                    setShowCapsule,
+                })
             } catch (err) {
                 console.error("Error fetching app list:", err)
                 setError("Failed to load app list.")
@@ -118,52 +204,16 @@ function App() {
     }, [])
 
     const loadNewGame = async (apps = appList) => {
-        if (!apps || apps.length === 0) {
-            setError("No apps available.")
-            return
-        }
-        setLoading(true)
-        setShowCapsule(false)
-        setDescriptionRevealed(false)
-        setScorebarState("")
-        setPhase("guess")
-
-        const randomIndex = Math.floor(Math.random() * apps.length)
-        const appid = apps[randomIndex]
-        try {
-            const url = `api/appdetails/?appids=${appid}&filter=basic`
-            console.log(`Fetching ${appid} app details...`)
-            const data = await fetchWithExponentialBackoff(url)
-
-            if (!data[appid] || !data[appid].success || data[appid].data.type !== "game") {
-                await loadNewGame(apps)
-                return
-            }
-
-            const appData = data[appid].data
-            let is_sfw = true
-            if (appData.content_descriptors && appData.content_descriptors.ids) {
-                console.log(`Content descriptors: ${appData.content_descriptors.ids}`)
-                if (
-                    appData.content_descriptors.ids.includes(1) ||
-                    appData.content_descriptors.ids.includes(3) ||
-                    appData.content_descriptors.ids.includes(4)
-                ) {
-                    is_sfw = false
-                }
-            }
-            setCurrentGame({
-                appid,
-                name: appData.name,
-                capsule_image: appData.capsule_image,
-                short_description: decodeHtml(appData.short_description),
-                is_sfw
-            })
-            setLoading(false)
-        } catch (err) {
-            console.error("Error fetching app details after retries:", err)
-            await loadNewGame(apps)
-        }
+        await loadRandomGame({
+            apps,
+            setCurrentGame,
+            setDescriptionRevealed,
+            setError,
+            setLoading,
+            setPhase,
+            setScorebarState,
+            setShowCapsule,
+        })
     }
 
     const handleDontKnow = () => {

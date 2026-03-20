@@ -44,6 +44,7 @@ const RAW_RUNTIME_STATE =
           ["eslint-plugin-react-hooks", "virtual:a0c4babd90f8099bbb4f80b9f3dd9987fc242ee60708a4a960dfa862e75b32f59f9856680646d9bda31919081f84734aa5bdd9c9660c2dd9095ad82f2de1b089#npm:7.0.1"],\
           ["eslint-plugin-react-refresh", "virtual:a0c4babd90f8099bbb4f80b9f3dd9987fc242ee60708a4a960dfa862e75b32f59f9856680646d9bda31919081f84734aa5bdd9c9660c2dd9095ad82f2de1b089#npm:0.5.2"],\
           ["gh-pages", "npm:6.3.0"],\
+          ["globals", "npm:17.4.0"],\
           ["jiti", "npm:2.6.1"],\
           ["less", "npm:4.6.4"],\
           ["lightningcss", "npm:1.32.0"],\
@@ -3882,6 +3883,13 @@ const RAW_RUNTIME_STATE =
           ["globals", "npm:14.0.0"]\
         ],\
         "linkType": "HARD"\
+      }],\
+      ["npm:17.4.0", {\
+        "packageLocation": "./.yarn/cache/globals-npm-17.4.0-d04eded15b-2be9e8c2b9.zip/node_modules/globals/",\
+        "packageDependencies": [\
+          ["globals", "npm:17.4.0"]\
+        ],\
+        "linkType": "HARD"\
       }]\
     ]],\
     ["globalthis", [\
@@ -6616,6 +6624,7 @@ const RAW_RUNTIME_STATE =
           ["eslint-plugin-react-hooks", "virtual:a0c4babd90f8099bbb4f80b9f3dd9987fc242ee60708a4a960dfa862e75b32f59f9856680646d9bda31919081f84734aa5bdd9c9660c2dd9095ad82f2de1b089#npm:7.0.1"],\
           ["eslint-plugin-react-refresh", "virtual:a0c4babd90f8099bbb4f80b9f3dd9987fc242ee60708a4a960dfa862e75b32f59f9856680646d9bda31919081f84734aa5bdd9c9660c2dd9095ad82f2de1b089#npm:0.5.2"],\
           ["gh-pages", "npm:6.3.0"],\
+          ["globals", "npm:17.4.0"],\
           ["jiti", "npm:2.6.1"],\
           ["less", "npm:4.6.4"],\
           ["lightningcss", "npm:1.32.0"],\
