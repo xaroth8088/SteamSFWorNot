@@ -6,6 +6,8 @@ import ConfettiImport from 'react-dom-confetti';
 const Confetti = ConfettiImport.default ?? ConfettiImport
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+const ADULT_CONTENT_DESCRIPTOR_IDS = [1, 3, 4]
+const SALE_QUERY_PAGE_SIZE = 5000
 
 function decodeHtml(html) {
     const textarea = document.createElement('textarea')
@@ -35,6 +37,71 @@ async function fetchWithExponentialBackoff(url, retries = 5, delay = 500) {
     }
 }
 
+function buildSaleQueryParams(rgSubexpressions, start = 0) {
+    return {
+        cc: "US",
+        flavor: "contenthub_all",
+        tabuniqueid: "3",
+        sectionuniqueid: "13268",
+        strContentHubType: "category",
+        strContentHubCategory: "singleplayer",
+        strFacetFilter: JSON.stringify({
+            type: 1,
+            rgSubexpressions
+        }),
+        count: String(SALE_QUERY_PAGE_SIZE),
+        start: String(start)
+    }
+}
+
+async function fetchSaleQueryAppIds(rgSubexpressions, start = 0) {
+    const queryString = new URLSearchParams(buildSaleQueryParams(rgSubexpressions, start)).toString()
+    const data = await fetchWithExponentialBackoff(
+        `saleaction/ajaxgetsaledynamicappquery?${queryString}`
+    )
+    return data.appids ?? []
+}
+
+async function fetchBalancedAppPool() {
+    const gameFilter = [{type: 7, value: "game"}]
+    const nsfwAppids = await fetchSaleQueryAppIds([
+        ...gameFilter,
+        ...ADULT_CONTENT_DESCRIPTOR_IDS.map((value) => ({type: 5, value}))
+    ])
+    const nsfwUniqueAppids = Array.from(new Set(nsfwAppids))
+    const nsfwSet = new Set(nsfwUniqueAppids)
+    const sfwSet = new Set()
+
+    for (let start = 0; sfwSet.size < nsfwSet.size; start += SALE_QUERY_PAGE_SIZE) {
+        const appids = await fetchSaleQueryAppIds(gameFilter, start)
+        if (appids.length === 0) {
+            break
+        }
+
+        for (const appid of appids) {
+            if (!nsfwSet.has(appid)) {
+                sfwSet.add(appid)
+            }
+        }
+
+        if (appids.length < SALE_QUERY_PAGE_SIZE) {
+            break
+        }
+    }
+
+    const balancedCount = Math.min(nsfwUniqueAppids.length, sfwSet.size)
+    const sfwAppids = Array.from(sfwSet).slice(0, balancedCount)
+    const nsfwBalancedAppids = nsfwUniqueAppids.slice(0, balancedCount)
+
+    return {
+        apps: [...nsfwBalancedAppids, ...sfwAppids],
+        counts: {
+            sfw: sfwAppids.length,
+            nsfw: nsfwBalancedAppids.length
+        }
+    }
+}
+
 async function loadRandomGame({
     apps,
     setCurrentGame,
@@ -47,7 +114,9 @@ async function loadRandomGame({
 }) {
     if (!apps || apps.length === 0) {
         setError("No apps available.")
-        return
+        setCurrentGame(null)
+        setLoading(false)
+        return []
     }
 
     setLoading(true)
@@ -58,6 +127,7 @@ async function loadRandomGame({
 
     const randomIndex = Math.floor(Math.random() * apps.length)
     const appid = apps[randomIndex]
+    const remainingApps = apps.filter((_, index) => index !== randomIndex)
 
     try {
         const url = `api/appdetails/?appids=${appid}&filter=basic`
@@ -65,8 +135,8 @@ async function loadRandomGame({
         const data = await fetchWithExponentialBackoff(url)
 
         if (!data[appid] || !data[appid].success || data[appid].data.type !== "game") {
-            await loadRandomGame({
-                apps,
+            return await loadRandomGame({
+                apps: remainingApps,
                 setCurrentGame,
                 setDescriptionRevealed,
                 setError,
@@ -75,18 +145,13 @@ async function loadRandomGame({
                 setScorebarState,
                 setShowCapsule,
             })
-            return
         }
 
         const appData = data[appid].data
         let is_sfw = true
         if (appData.content_descriptors && appData.content_descriptors.ids) {
             console.log(`Content descriptors: ${appData.content_descriptors.ids}`)
-            if (
-                appData.content_descriptors.ids.includes(1) ||
-                appData.content_descriptors.ids.includes(3) ||
-                appData.content_descriptors.ids.includes(4)
-            ) {
+            if (ADULT_CONTENT_DESCRIPTOR_IDS.some((id) => appData.content_descriptors.ids.includes(id))) {
                 is_sfw = false
             }
         }
@@ -98,10 +163,11 @@ async function loadRandomGame({
             is_sfw
         })
         setLoading(false)
+        return remainingApps
     } catch (err) {
         console.error("Error fetching app details after retries:", err)
-        await loadRandomGame({
-            apps,
+        return await loadRandomGame({
+            apps: remainingApps,
             setCurrentGame,
             setDescriptionRevealed,
             setError,
@@ -116,6 +182,7 @@ async function loadRandomGame({
 function App() {
     const [score, setScore] = useState(0)
     const [appList, setAppList] = useState(null)
+    const [remainingApps, setRemainingApps] = useState([])
     const [loadedCounts, setLoadedCounts] = useState({sfw: 0, nsfw: 0})
     const [currentGame, setCurrentGame] = useState(null)
     const [loading, setLoading] = useState(true)
@@ -133,60 +200,10 @@ function App() {
     useEffect(() => {
         async function fetchAppList() {
             try {
-                // Fetch NSFW and SFW app lists and then merge
-                let params = {
-                    cc: "US",
-                    flavor: "contenthub_all",
-                    tabuniqueid: "3",
-                    sectionuniqueid: "13268",
-                    strContentHubType: "category",
-                    strContentHubCategory: "singleplayer",
-                    strFacetFilter: JSON.stringify({
-                        type: 1,
-                        rgSubexpressions: [
-                            {type: 7, value: "game"},
-                            {type: 5, value: 1},
-                            {type: 5, value: 3},
-                            {type: 5, value: 4}
-                        ]
-                    }),
-                    count: "5000",
-                    start: "0"
-                }
-
-                let queryString = new URLSearchParams(params).toString()
-                let data = await fetchWithExponentialBackoff(
-                    `saleaction/ajaxgetsaledynamicappquery?${queryString}`
-                )
-                const nsfwAppids = data.appids
-
-                params = {
-                    cc: "US",
-                    flavor: "contenthub_all",
-                    tabuniqueid: "3",
-                    sectionuniqueid: "13268",
-                    strContentHubType: "category",
-                    strContentHubCategory: "singleplayer",
-                    strFacetFilter: JSON.stringify({
-                        type: 1,
-                        rgSubexpressions: [{type: 7, value: "game"}]
-                    }),
-                    count: "5000",
-                    start: "0"
-                }
-                queryString = new URLSearchParams(params).toString()
-                data = await fetchWithExponentialBackoff(
-                    `saleaction/ajaxgetsaledynamicappquery?${queryString}`
-                )
-                const sfwAppids = data.appids
-
-                const apps = [...nsfwAppids, ...sfwAppids]
-                setLoadedCounts({
-                    sfw: sfwAppids.length,
-                    nsfw: nsfwAppids.length
-                })
+                const {apps, counts} = await fetchBalancedAppPool()
+                setLoadedCounts(counts)
                 setAppList(apps)
-                await loadRandomGame({
+                const nextRemainingApps = await loadRandomGame({
                     apps,
                     setCurrentGame,
                     setDescriptionRevealed,
@@ -196,6 +213,7 @@ function App() {
                     setScorebarState,
                     setShowCapsule,
                 })
+                setRemainingApps(nextRemainingApps)
             } catch (err) {
                 console.error("Error fetching app list:", err)
                 setError("Failed to load app list.")
@@ -205,8 +223,8 @@ function App() {
         fetchAppList()
     }, [])
 
-    const loadNewGame = async (apps = appList) => {
-        await loadRandomGame({
+    const loadNewGame = async (apps = remainingApps) => {
+        const nextRemainingApps = await loadRandomGame({
             apps,
             setCurrentGame,
             setDescriptionRevealed,
@@ -216,6 +234,7 @@ function App() {
             setScorebarState,
             setShowCapsule,
         })
+        setRemainingApps(nextRemainingApps)
     }
 
     const handleDontKnow = () => {
@@ -266,7 +285,7 @@ function App() {
         setScore(0)
         setCorrectGames([])
         setIsSidebarOpen(false)
-        await loadNewGame()
+        await loadNewGame(appList)
     }
 
     let mainContent;
