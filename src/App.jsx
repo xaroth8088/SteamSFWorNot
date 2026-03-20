@@ -4,6 +4,25 @@ import Scorebar from "./Scorebar.jsx";
 import ConfettiImport from 'react-dom-confetti';
 
 const Confetti = ConfettiImport.default ?? ConfettiImport
+const GAME_MODES = {
+    hardcore: "hardcore",
+    normal: "normal",
+    endless: "endless"
+}
+const GAME_MODE_DETAILS = {
+    [GAME_MODES.hardcore]: {
+        label: "Hardcore",
+        title: "One mistake ends the run",
+    },
+    [GAME_MODES.normal]: {
+        label: "Normal",
+        title: "Three strikes and you're out",
+    },
+    [GAME_MODES.endless]: {
+        label: "Endless",
+        title: "Play forever, track accuracy",
+    }
+}
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 const ADULT_CONTENT_DESCRIPTOR_IDS = [1, 3, 4]
@@ -181,12 +200,16 @@ async function loadRandomGame({
 
 function App() {
     const [score, setScore] = useState(0)
+    const [gameMode, setGameMode] = useState(GAME_MODES.hardcore)
+    const [wrongAnswers, setWrongAnswers] = useState(0)
+    const [correctAnswers, setCorrectAnswers] = useState(0)
+    const [totalAnswers, setTotalAnswers] = useState(0)
     const [appList, setAppList] = useState(null)
     const [remainingApps, setRemainingApps] = useState([])
     const [loadedCounts, setLoadedCounts] = useState({sfw: 0, nsfw: 0})
     const [currentGame, setCurrentGame] = useState(null)
     const [loading, setLoading] = useState(true)
-    // phases: "loading", "guess", "afterImage", "feedback", "gameover"
+    // phases: "loading", "start", "guess", "afterImage", "feedback", "gameover"
     const [phase, setPhase] = useState("loading")
     const [scorebarState, setScorebarState] = useState("")
     const [showCapsule, setShowCapsule] = useState(false)
@@ -203,17 +226,10 @@ function App() {
                 const {apps, counts} = await fetchBalancedAppPool()
                 setLoadedCounts(counts)
                 setAppList(apps)
-                const nextRemainingApps = await loadRandomGame({
-                    apps,
-                    setCurrentGame,
-                    setDescriptionRevealed,
-                    setError,
-                    setLoading,
-                    setPhase,
-                    setScorebarState,
-                    setShowCapsule,
-                })
-                setRemainingApps(nextRemainingApps)
+                setRemainingApps(apps)
+                setCurrentGame(null)
+                setLoading(false)
+                setPhase("start")
             } catch (err) {
                 console.error("Error fetching app list:", err)
                 setError("Failed to load app list.")
@@ -237,6 +253,29 @@ function App() {
         setRemainingApps(nextRemainingApps)
     }
 
+    const resetRunState = () => {
+        setScore(0)
+        setWrongAnswers(0)
+        setCorrectAnswers(0)
+        setTotalAnswers(0)
+        setCorrectGames([])
+        setScorebarState("")
+        setIsExploding(false)
+        setIsSidebarOpen(false)
+    }
+
+    const returnToStartScreen = () => {
+        resetRunState()
+        setCurrentGame(null)
+        setLoading(false)
+        setPhase("start")
+    }
+
+    const handleStartGame = async () => {
+        resetRunState()
+        await loadNewGame(appList)
+    }
+
     const handleDontKnow = () => {
         if (phase === "guess") {
             setShowCapsule(true)
@@ -256,18 +295,42 @@ function App() {
             correct = !currentGame.is_sfw
         }
 
+        setTotalAnswers((prev) => prev + 1)
+
         if (!correct) {
-            setScorebarState("incorrect")
+            if (gameMode === GAME_MODES.endless) {
+                setScorebarState("incorrect")
+                setPhase("feedback")
+                return
+            }
+
+            if (gameMode === GAME_MODES.normal) {
+                const nextWrongAnswers = wrongAnswers + 1
+                setWrongAnswers(nextWrongAnswers)
+                if (nextWrongAnswers >= 3) {
+                    setScorebarState("gameover")
+                    setPhase("gameover")
+                    return
+                }
+                setScorebarState("incorrect")
+                setPhase("feedback")
+                return
+            }
+
+            setScorebarState("gameover")
             setPhase("gameover")
             return
         } else {
+            setCorrectAnswers((prev) => prev + 1)
             let points = 0
-            if (phase === "guess") {
-                points = 10
-            } else if (phase === "afterImage") {
-                points = descriptionRevealed ? 1 : 5
+            if (gameMode !== GAME_MODES.endless) {
+                if (phase === "guess") {
+                    points = 10
+                } else if (phase === "afterImage") {
+                    points = descriptionRevealed ? 1 : 5
+                }
+                setScore((prev) => prev + points)
             }
-            setScore((prev) => prev + points)
             setScorebarState("correct")
             setPhase("feedback")
             setCorrectGames((prev) => [currentGame, ...prev])
@@ -282,11 +345,24 @@ function App() {
     }
 
     const handleRestartGame = async () => {
-        setScore(0)
-        setCorrectGames([])
-        setIsSidebarOpen(false)
-        await loadNewGame(appList)
+        returnToStartScreen()
     }
+
+    const handleSelectMode = (nextMode) => {
+        if (nextMode === gameMode) {
+            return
+        }
+
+        setGameMode(nextMode)
+        resetRunState()
+    }
+
+    const accuracyPercent = totalAnswers > 0
+        ? Math.round((correctAnswers / totalAnswers) * 100)
+        : 0
+    const scoreLabel = gameMode === GAME_MODES.endless ? "Accuracy" : "Current Score"
+    const scoreValue = gameMode === GAME_MODES.endless ? `${accuracyPercent}%` : score
+    const finalSummaryLabel = gameMode === GAME_MODES.endless ? "Accuracy" : "Final Score"
 
     let mainContent;
     let buttons;
@@ -297,7 +373,7 @@ function App() {
     const showDescription = isResultPhase || (phase === "afterImage" && descriptionRevealed)
     const showStableLayout = !loading && currentGame
 
-    if (loading || !currentGame) {
+    if (loading) {
         panelClassName += " is-loading";
         panelTitle = "Preparing a New Round";
         mainContent = (
@@ -306,11 +382,46 @@ function App() {
                 <p className="placeholder-copy">Loading...</p>
             </div>
         )
+    } else if (phase === "start") {
+        panelClassName += " is-start";
+        mainContent = (
+            <div className="mode-select">
+                <div className="start-logo" aria-label="Steam SFW or Not">
+                    <span className="start-logo-kicker">Steam</span>
+                    <h1 className="start-logo-title">
+                        <span className="start-logo-safe">SFW</span>
+                        <span className="start-logo-divider">or</span>
+                        <span className="start-logo-risky">Not</span>
+                    </h1>
+                </div>
+                <p className="start-copy">Office-safe game or HR violation? Separate safe from suspect.</p>
+                <div className="mode-grid">
+                    {Object.values(GAME_MODES).map((mode) => {
+                        const modeDetails = GAME_MODE_DETAILS[mode]
+                        return (
+                            <button
+                                key={mode}
+                                type="button"
+                                className={`mode-card ${gameMode === mode ? "is-active" : ""}`}
+                                onClick={() => handleSelectMode(mode)}
+                                aria-pressed={gameMode === mode}
+                            >
+                                <span className="mode-card-label">{modeDetails.label}</span>
+                                <span className="mode-card-title">{modeDetails.title}</span>
+                            </button>
+                        )
+                    })}
+                </div>
+            </div>
+        );
+        buttons = (
+            <button onClick={handleStartGame}>Start Game</button>
+        );
     } else if (phase === "gameover") {
         panelClassName += " is-result";
         mainContent = null;
         buttons = (
-            <button onClick={handleRestartGame}>Restart Game</button>
+            <button onClick={handleRestartGame}>Return to Start</button>
         );
     } else if (phase === "feedback") {
         panelClassName += " is-result";
@@ -324,8 +435,8 @@ function App() {
         mainContent = null;
         buttons = (
             <>
-                <button className="answer-button" onClick={() => handleAnswer("yes")}>SAFE</button>
-                <button className="answer-button" onClick={() => handleAnswer("no")}>NSFW</button>
+                <button className="answer-button answer-button-safe" onClick={() => handleAnswer("yes")}>SAFE</button>
+                <button className="answer-button answer-button-nsfw" onClick={() => handleAnswer("no")}>NSFW</button>
                 {(phase === "guess" ||
                     (phase === "afterImage" && !descriptionRevealed)) && (
                     <button className="hint-button" onClick={handleDontKnow}>I don&#39;t know</button>
@@ -338,7 +449,7 @@ function App() {
         mainContent = (
             <>
                 {phase === "gameover" && (
-                    <p className="round-summary">Final Score: {score}</p>
+                    <p className="round-summary">{finalSummaryLabel}: {scoreValue}</p>
                 )}
                 <h3 className="game-title">{currentGame.name}</h3>
                 <div className={`capsule-slot ${showCapsule || isResultPhase ? "is-revealed" : "is-concealed"}`}>
@@ -395,7 +506,8 @@ function App() {
         <>
             <Sidebar
                 correctGames={correctGames}
-                score={score}
+                scoreLabel={scoreLabel}
+                scoreValue={scoreValue}
                 isOpen={isSidebarOpen}
                 onToggle={() => setIsSidebarOpen((prev) => !prev)}
                 onClose={() => setIsSidebarOpen(false)}
@@ -403,6 +515,9 @@ function App() {
             <Scorebar
                 scorebarState={scorebarState}
                 loadedCounts={loadedCounts}
+                gameMode={gameMode}
+                wrongAnswers={wrongAnswers}
+                onBack={phase === "start" || phase === "loading" ? null : returnToStartScreen}
             >
                 <div className="confetti-container">
                     <Confetti active={isExploding} config={{

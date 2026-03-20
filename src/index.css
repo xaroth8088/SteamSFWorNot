@@ -179,6 +179,12 @@ button:focus-visible {
     min-height: 18rem;
 }
 
+.main-panel.is-start .panel-body {
+    align-content: start;
+    gap: 1.4rem;
+    padding-top: 1rem;
+}
+
 .game-title {
     font-size: clamp(1.35rem, 2.2vw, 1.7rem);
     line-height: 1.25;
@@ -193,6 +199,120 @@ button:focus-visible {
     font-weight: 700;
     letter-spacing: 0.02em;
     color: #24486d;
+}
+
+.start-copy {
+    max-width: 34rem;
+    margin: 0;
+    text-align: center;
+    line-height: 1.6;
+    color: #4c6278;
+    font-style: italic;
+}
+
+.mode-select {
+    width: min(100%, 42rem);
+    display: grid;
+    gap: 1rem;
+}
+
+.start-logo {
+    display: grid;
+    justify-items: center;
+    gap: 0.2rem;
+    padding: 0.8rem 1rem 0.4rem;
+}
+
+.start-logo-kicker {
+    font-size: 0.82rem;
+    font-weight: 900;
+    letter-spacing: 0.42em;
+    text-transform: uppercase;
+    color: #6383a3;
+    text-indent: 0.42em;
+}
+
+.start-logo-title {
+    margin: 0;
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    font-size: clamp(2.4rem, 7vw, 4.6rem);
+    line-height: 0.95;
+    letter-spacing: -0.06em;
+    text-transform: uppercase;
+}
+
+.start-logo-safe,
+.start-logo-risky {
+    position: relative;
+    display: inline-block;
+    padding: 0.1em 0.2em 0.16em;
+    border-radius: 0.22em;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.65),
+        0 12px 28px rgba(21, 52, 84, 0.12);
+}
+
+.start-logo-safe {
+    color: #113a20;
+    background: linear-gradient(180deg, #aff5b8 0%, #64d685 100%);
+}
+
+.start-logo-risky {
+    color: #581919;
+    background: linear-gradient(180deg, #ffb0a9 0%, #f16b6b 100%);
+}
+
+.start-logo-divider {
+    font-size: 0.32em;
+    font-weight: 900;
+    letter-spacing: 0.22em;
+    color: #73869b;
+    text-transform: lowercase;
+    transform: translateY(-0.25em);
+}
+
+.mode-grid {
+    display: grid;
+    gap: 0.9rem;
+}
+
+.mode-card {
+    width: 100%;
+    margin: 0;
+    padding: 1.1rem 1.2rem;
+    border-radius: 24px;
+    text-align: left;
+    text-transform: none;
+    letter-spacing: 0;
+    display: grid;
+    gap: 0.35rem;
+}
+
+.mode-card.is-active {
+    border-color: rgba(21, 66, 112, 0.48);
+    background:
+        linear-gradient(180deg, rgba(226, 239, 252, 0.96), rgba(205, 226, 246, 0.96));
+    box-shadow:
+        0 16px 30px rgba(25, 56, 88, 0.12),
+        0 0 0 1px rgba(41, 88, 137, 0.08);
+}
+
+.mode-card-label {
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #4b6b8b;
+}
+
+.mode-card-title {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #17314d;
 }
 
 .content-placeholder {
@@ -385,6 +505,26 @@ button:focus-visible {
     min-width: 10rem;
 }
 
+.answer-button-safe {
+    color: #113a20;
+    border-color: rgba(46, 110, 66, 0.28);
+    background: linear-gradient(180deg, #dff9e4 0%, #9ae6ab 100%);
+}
+
+.answer-button-safe:hover {
+    border-color: rgba(33, 97, 54, 0.42);
+}
+
+.answer-button-nsfw {
+    color: #581919;
+    border-color: rgba(153, 67, 67, 0.28);
+    background: linear-gradient(180deg, #ffe0db 0%, #f4a29a 100%);
+}
+
+.answer-button-nsfw:hover {
+    border-color: rgba(130, 44, 44, 0.42);
+}
+
 .hint-button {
     min-width: 12rem;
 }
@@ -493,17 +633,78 @@ button:focus-visible {
     backdrop-filter: blur(10px);
 }
 
+.scorebar-nav-button {
+    border: 0;
+    height: 2.75rem;
+    width: 2.75rem;
+    border-right: 1px solid rgba(0, 0, 0, 0.16);
+    text-align: center;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    box-shadow: none;
+    border-radius: 0;
+    font-size: 1.2rem;
+    line-height: 1;
+}
+
+.scorebar-nav-button:hover:not(:disabled) {
+    transform: none;
+    box-shadow: none;
+    background: rgba(20, 46, 72, 0.05);
+}
+
+.scorebar-nav-button:disabled {
+    cursor: default;
+    opacity: 0.35;
+}
+
 .scorebar-text {
     text-align: center;
     flex: 1;
+    padding: 0.3rem 0.75rem 0.35rem;
 }
 
 .scorebar-title {
     font-weight: 700;
 }
 
+.scorebar-meta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+}
+
 .scorebar-loaded {
     font-size: 0.7rem;
+}
+
+.scorebar-mode-label {
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #36546f;
+}
+
+.strike-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.strike-mark {
+    font-size: 1.15rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    color: #d8dce3;
+    transition: color 140ms ease;
+}
+
+.strike-mark.is-used {
+    color: #d73636;
 }
 
 .scorebar.incorrect {
@@ -642,6 +843,10 @@ button:focus-visible {
         padding: 0 0.4rem;
     }
 
+    .scorebar-meta {
+        gap: 0.5rem;
+    }
+
 }
 
 @media (max-width: 560px) {
@@ -678,6 +883,23 @@ button:focus-visible {
 
     .panel-title {
         font-size: clamp(1.55rem, 8vw, 2.1rem);
+    }
+
+    .scorebar-text {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+
+    .start-logo-title {
+        gap: 0.45rem;
+    }
+
+    .scorebar-meta {
+        gap: 0.45rem;
+    }
+
+    .mode-card {
+        padding: 1rem;
     }
 
     .content-placeholder,

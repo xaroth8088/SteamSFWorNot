@@ -1,4 +1,4 @@
-export default function Sidebar({correctGames, score, isOpen, onToggle, onClose}) {
+export default function Sidebar({correctGames, scoreLabel, scoreValue, isOpen, onToggle, onClose}) {
     const sidebarClasses = ["sidebar"]
 
     if (isOpen) {
@@ -10,8 +10,8 @@ export default function Sidebar({correctGames, score, isOpen, onToggle, onClose}
             <aside className={sidebarClasses.join(" ")}>
                 <div className="sidebar-header">
                     <div>
-                        <p className="sidebar-eyebrow">Current Score</p>
-                        <h2 className="sidebar-title">{score}</h2>
+                        <p className="sidebar-eyebrow">{scoreLabel}</p>
+                        <h2 className="sidebar-title">{scoreValue}</h2>
                     </div>
                     <button
                         type="button"
