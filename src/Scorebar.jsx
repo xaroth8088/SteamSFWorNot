@@ -7,7 +7,7 @@ function switchToFullscreen() {
 	}
 }
 
-export default function Scorebar({scorebarState, score, loadedCounts, children}) {
+export default function Scorebar({scorebarState, loadedCounts, children}) {
     const styles = ["scorebar"];
 
     let text = "Is this game SFW?";
@@ -30,9 +30,6 @@ export default function Scorebar({scorebarState, score, loadedCounts, children})
                     Loaded: {loadedCounts.sfw} SFW / {loadedCounts.nsfw} NSFW
                 </div>
                 {children}
-            </div>
-            <div className="scorebar-score">
-                Score: {score}
             </div>
             <button className="fullscreen-button" onClick={switchToFullscreen}>
                 <img src={fullscreenIconUrl} alt="Icon" />

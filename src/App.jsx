@@ -324,13 +324,13 @@ function App() {
         <>
             <Sidebar
                 correctGames={correctGames}
+                score={score}
                 isOpen={isSidebarOpen}
                 onToggle={() => setIsSidebarOpen((prev) => !prev)}
                 onClose={() => setIsSidebarOpen(false)}
             />
             <Scorebar
                 scorebarState={scorebarState}
-                score={score}
                 loadedCounts={loadedCounts}
             >
                 <div className="confetti-container">

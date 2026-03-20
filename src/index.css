@@ -506,13 +506,6 @@ button:focus-visible {
     font-size: 0.7rem;
 }
 
-.scorebar-score {
-    border-left: 1px solid rgba(0, 0, 0, 0.16);
-    padding: 0 1rem;
-    text-align: right;
-    white-space: nowrap;
-}
-
 .scorebar.incorrect {
     background: linear-gradient(180deg, #ff7a7a 0%, #ff4c4c 100%);
 }
