@@ -1,7 +1,9 @@
 import React, {useEffect, useState} from 'react'
 import Sidebar from "./Sidebar.jsx";
 import Scorebar from "./Scorebar.jsx";
-import Confetti from 'react-dom-confetti';
+import ConfettiImport from 'react-dom-confetti';
+
+const Confetti = ConfettiImport.default ?? ConfettiImport
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
