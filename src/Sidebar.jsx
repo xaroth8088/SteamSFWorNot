@@ -26,7 +26,11 @@ export default function Sidebar({correctGames, isOpen, onToggle, onClose}) {
                 <div className="sidebar-list" id="viewed-games-list">
                     {correctGames.map((game, index) => (
                         <div key={index} className="sidebar-item">
+                            <span className={`sidebar-badge ${game.is_sfw ? "is-sfw" : "is-nsfw"}`}>
+                                {game.is_sfw ? "SFW" : "NSFW"}
+                            </span>
                             <a
+                                className="sidebar-link"
                                 href={`https://store.steampowered.com/app/${game.appid}`}
                                 target="_blank"
                                 rel="noopener noreferrer"

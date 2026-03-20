@@ -220,15 +220,15 @@ function App() {
     let mainContent;
     let buttons;
     let panelClassName = "main-panel";
-    let panelEyebrow = "Current Round";
-    let panelTitle = "Classify This Game";
-    let panelSubtitle = "Decide if the game is safe for work. Use hints only if you need them.";
+    let panelTitle = "";
+
+    const isResultPhase = phase === "feedback" || phase === "gameover"
+    const showDescription = isResultPhase || (phase === "afterImage" && descriptionRevealed)
+    const showStableLayout = !loading && currentGame
 
     if (loading || !currentGame) {
         panelClassName += " is-loading";
-        panelEyebrow = "Loading";
         panelTitle = "Preparing a New Round";
-        panelSubtitle = "Pulling a random Steam game and checking its details.";
         mainContent = (
             <div className="content-placeholder">
                 <div className="placeholder-orb" aria-hidden="true"></div>
@@ -237,112 +237,20 @@ function App() {
         )
     } else if (phase === "gameover") {
         panelClassName += " is-result";
-        panelEyebrow = "Round Complete";
-        panelTitle = "Game Over";
-        panelSubtitle = "The correct title and store art are now revealed.";
-        mainContent = (
-            <>
-                <h2>Final Score: {score}</h2>
-                <h3 className="game-title">{currentGame.name}</h3>
-                {currentGame.capsule_image && (
-                    <div className="capsule-frame">
-                        <a
-                            href={`https://store.steampowered.com/app/${currentGame.appid}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            <img
-                                src={currentGame.capsule_image}
-                                alt="Capsule"
-                                className="capsule-image"
-                            />
-                        </a>
-                    </div>
-                )}
-                {currentGame.short_description && (
-                    <p className="description">{currentGame.short_description}</p>
-                )}
-            </>
-        );
+        mainContent = null;
         buttons = (
             <button onClick={handleRestartGame}>Restart Game</button>
         );
     } else if (phase === "feedback") {
         panelClassName += " is-result";
-        panelEyebrow = "Correct";
-        panelTitle = "Nice Call";
-        panelSubtitle = "The game details are visible before you move to the next round.";
-        mainContent = (
-            <>
-                <h3 className="game-title">{currentGame.name}</h3>
-                {currentGame.capsule_image && (
-                    <div className="capsule-frame">
-                        <a
-                            href={`https://store.steampowered.com/app/${currentGame.appid}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            <img
-                                src={currentGame.capsule_image}
-                                alt="Capsule"
-                                className="capsule-image"
-                            />
-                        </a>
-                    </div>
-                )}
-                {currentGame.short_description && (
-                    <p className="description">{currentGame.short_description}</p>
-                )}
-            </>
-        );
+        mainContent = null;
         buttons = (
             <button onClick={handleNextGame}>Next Game</button>
         );
     } else {
         // phase "guess" or "afterImage"
         panelClassName += " is-guessing";
-        panelEyebrow = phase === "afterImage" ? "Hint Revealed" : "Name Only";
-        panelTitle = currentGame.name;
-        panelSubtitle =
-            phase === "afterImage"
-                ? (descriptionRevealed
-                    ? "The store description is now visible."
-                    : "The store capsule is visible.")
-                : "Make your call from the title alone, or ask for a hint.";
-        mainContent = (
-            <>
-                {!showCapsule && (
-                    <div className="content-placeholder content-placeholder-quiet">
-                        <div className="placeholder-card" aria-hidden="true">
-                            <span></span>
-                        </div>
-                        <p className="placeholder-copy">
-                            Capsule art stays hidden until you ask for a hint.
-                        </p>
-                    </div>
-                )}
-                {showCapsule && currentGame.capsule_image && (
-                    <div className="capsule-frame">
-                        <a
-                            href={`https://store.steampowered.com/app/${currentGame.appid}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            <img
-                                src={currentGame.capsule_image}
-                                alt="Capsule"
-                                className="capsule-image"
-                            />
-                        </a>
-                    </div>
-                )}
-                {phase === "afterImage" &&
-                    descriptionRevealed &&
-                    currentGame.short_description && (
-                        <p className="description">{currentGame.short_description}</p>
-                    )}
-            </>
-        );
+        mainContent = null;
         buttons = (
             <>
                 <button className="answer-button" onClick={() => handleAnswer("yes")}>SAFE</button>
@@ -353,6 +261,63 @@ function App() {
                 )}
             </>
         );
+    }
+
+    if (showStableLayout) {
+        mainContent = (
+            <>
+                {phase === "gameover" && (
+                    <p className="round-summary">Final Score: {score}</p>
+                )}
+                <h3 className="game-title">{currentGame.name}</h3>
+                <div className={`capsule-slot ${showCapsule || isResultPhase ? "is-revealed" : "is-concealed"}`}>
+                    {showCapsule || isResultPhase ? (
+                        currentGame.capsule_image ? (
+                            <div className="capsule-frame">
+                                <a
+                                    href={`https://store.steampowered.com/app/${currentGame.appid}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    <img
+                                        src={currentGame.capsule_image}
+                                        alt="Capsule"
+                                        className="capsule-image"
+                                    />
+                                </a>
+                            </div>
+                        ) : (
+                            <div className="capsule-frame capsule-frame-empty" aria-hidden="true">
+                                <div className="placeholder-card">
+                                    <span></span>
+                                </div>
+                            </div>
+                        )
+                    ) : (
+                        <div className="capsule-frame capsule-frame-muted">
+                            <div className="placeholder-card">
+                                <div className="capsule-placeholder-copy">
+                                    Press &quot;I don&apos;t know&quot; to reveal the store capsule
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+                <div className={`description-slot ${showDescription ? "is-revealed" : "is-concealed"}`}>
+                    {showDescription ? (
+                        currentGame.short_description ? (
+                            <p className="description">{currentGame.short_description}</p>
+                        ) : (
+                            <div className="description description-empty" aria-hidden="true"></div>
+                        )
+                    ) : (
+                        <div className="description description-muted">
+                            <p className={`description-blur-line description-helper ${showCapsule ? "is-readable" : ""}`}>Use another hint to reveal the full summary</p>
+                        </div>
+                    )}
+                </div>
+            </>
+        )
     }
 
     return (
@@ -387,11 +352,11 @@ function App() {
             <div className="main-content">
                 <section className="main-stage">
                     <div className={panelClassName}>
-                        <div className="panel-header">
-                            <p className="panel-eyebrow">{panelEyebrow}</p>
-                            <h1 className="panel-title">{panelTitle}</h1>
-                            <p className="panel-subtitle">{panelSubtitle}</p>
-                        </div>
+                        {panelTitle && (
+                            <div className="panel-header">
+                                <h1 className="panel-title">{panelTitle}</h1>
+                            </div>
+                        )}
                         <div className="panel-body">
                             {mainContent}
                         </div>
