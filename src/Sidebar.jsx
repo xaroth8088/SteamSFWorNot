@@ -1,4 +1,4 @@
-export default function Sidebar({correctGames, scoreLabel, scoreValue, isOpen, onToggle, onClose}) {
+export default function Sidebar({viewedGames, scoreLabel, scoreValue, isOpen, onToggle, onClose}) {
     const sidebarClasses = ["sidebar"]
 
     if (isOpen) {
@@ -20,11 +20,11 @@ export default function Sidebar({correctGames, scoreLabel, scoreValue, isOpen, o
                         aria-expanded={isOpen}
                         aria-controls="viewed-games-list"
                     >
-                        {isOpen ? "Hide" : `Viewed Games (${correctGames.length})`}
+                        {isOpen ? "Hide" : `Viewed Games (${viewedGames.length})`}
                     </button>
                 </div>
                 <div className="sidebar-list" id="viewed-games-list">
-                    {correctGames.map((game, index) => (
+                    {viewedGames.map((game, index) => (
                         <div key={index} className="sidebar-item">
                             <span className={`sidebar-badge ${game.is_sfw ? "is-sfw" : "is-nsfw"}`}>
                                 {game.is_sfw ? "SFW" : "NSFW"}

@@ -215,8 +215,8 @@ function App() {
     const [showCapsule, setShowCapsule] = useState(false)
     const [descriptionRevealed, setDescriptionRevealed] = useState(false)
     const [, setError] = useState("")
-    // List of games correctly answered (most recent first)
-    const [correctGames, setCorrectGames] = useState([])
+    // List of games viewed this run (most recent first)
+    const [viewedGames, setViewedGames] = useState([])
     const [isExploding, setIsExploding] = React.useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
@@ -258,10 +258,22 @@ function App() {
         setWrongAnswers(0)
         setCorrectAnswers(0)
         setTotalAnswers(0)
-        setCorrectGames([])
+        setViewedGames([])
         setScorebarState("")
         setIsExploding(false)
         setIsSidebarOpen(false)
+    }
+
+    const addViewedGame = (game) => {
+        if (!game) return
+
+        setViewedGames((prev) => {
+            if (prev.some((viewedGame) => viewedGame.appid === game.appid)) {
+                return prev
+            }
+
+            return [game, ...prev]
+        })
     }
 
     const returnToStartScreen = () => {
@@ -291,6 +303,7 @@ function App() {
         }
 
         setTotalAnswers((prev) => prev + 1)
+        addViewedGame(currentGame)
 
         if (!correct) {
             if (gameMode === GAME_MODES.endless) {
@@ -328,7 +341,6 @@ function App() {
             }
             setScorebarState("correct")
             setPhase("feedback")
-            setCorrectGames((prev) => [currentGame, ...prev])
             setIsExploding(true);
         }
     }
@@ -452,7 +464,13 @@ function App() {
                     {showCapsule || isResultPhase ? (
                         currentGame.capsule_image ? (
                             <div className="capsule-frame">
+                                {isResultPhase && (
+                                    <span className={`sidebar-badge capsule-badge ${currentGame.is_sfw ? "is-sfw" : "is-nsfw"}`}>
+                                        {currentGame.is_sfw ? "SFW" : "NSFW"}
+                                    </span>
+                                )}
                                 <a
+                                    className="capsule-link"
                                     href={`https://store.steampowered.com/app/${currentGame.appid}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
@@ -466,6 +484,11 @@ function App() {
                             </div>
                         ) : (
                             <div className="capsule-frame capsule-frame-empty" aria-hidden="true">
+                                {isResultPhase && (
+                                    <span className={`sidebar-badge capsule-badge ${currentGame.is_sfw ? "is-sfw" : "is-nsfw"}`}>
+                                        {currentGame.is_sfw ? "SFW" : "NSFW"}
+                                    </span>
+                                )}
                                 <div className="placeholder-card">
                                     <span></span>
                                 </div>
@@ -501,7 +524,7 @@ function App() {
     return (
         <>
             <Sidebar
-                correctGames={correctGames}
+                viewedGames={viewedGames}
                 scoreLabel={scoreLabel}
                 scoreValue={scoreValue}
                 isOpen={isSidebarOpen}
