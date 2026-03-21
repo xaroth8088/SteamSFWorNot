@@ -91,6 +91,8 @@ button:focus-visible {
 
 .main-content {
     grid-area: main;
+    height: 100%;
+    min-height: 0;
     overflow-y: auto;
     overflow-x: hidden;
     padding: 1.5rem;
@@ -100,6 +102,7 @@ button:focus-visible {
 }
 
 .main-stage {
+    height: 100%;
     min-height: 100%;
     display: grid;
     place-items: center;
@@ -121,6 +124,12 @@ button:focus-visible {
     position: relative;
     overflow: hidden;
     text-align: left;
+}
+
+.main-panel.is-guessing,
+.main-panel.is-result {
+    height: min(100%, 34rem);
+    min-height: 0;
 }
 
 .main-panel::before {
@@ -207,6 +216,10 @@ button:focus-visible {
     align-self: stretch;
     justify-self: stretch;
     margin-inline: auto;
+}
+
+.stable-layout.has-summary {
+    grid-template-rows: auto auto auto minmax(5.3rem, 1fr);
 }
 
 .game-title {
@@ -471,6 +484,7 @@ button:focus-visible {
 .description {
     width: min(100%, 42rem);
     height: 100%;
+    min-height: 0;
     margin: 0;
     padding: 1rem 1.1rem;
     box-sizing: border-box;
@@ -485,7 +499,7 @@ button:focus-visible {
 
 .description-slot {
     width: min(100%, 42rem);
-    min-height: 5.3rem;
+    min-height: 0;
     height: 100%;
     display: grid;
     align-items: stretch;
@@ -1011,6 +1025,10 @@ button:focus-visible {
         padding-bottom: 0.5rem;
     }
 
+    .main-stage {
+        min-height: 0;
+    }
+
     .sidebar {
         padding: 0.9rem;
     }
@@ -1040,6 +1058,10 @@ button:focus-visible {
         grid-template-rows: auto auto minmax(5rem, 1fr);
         align-self: center;
         justify-self: center;
+    }
+
+    .stable-layout.has-summary {
+        grid-template-rows: auto auto auto minmax(5rem, 1fr);
     }
 
     .game-title {
@@ -1085,7 +1107,7 @@ button:focus-visible {
 
     .description-slot {
         width: 100%;
-        min-height: 5rem;
+        min-height: 0;
         height: 100%;
         align-items: stretch;
     }
@@ -1095,6 +1117,7 @@ button:focus-visible {
         line-height: 1.55;
         padding: 0.95rem 1rem;
         height: 100%;
+        min-height: 0;
         max-height: none;
     }
 

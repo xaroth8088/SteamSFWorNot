@@ -454,8 +454,10 @@ function App() {
     }
 
     if (showStableLayout) {
+        const stableLayoutClassName = `stable-layout${phase === "gameover" ? " has-summary" : ""}`
+
         mainContent = (
-            <div className="stable-layout">
+            <div className={stableLayoutClassName}>
                 {phase === "gameover" && (
                     <p className="round-summary">{finalSummaryLabel}: {scoreValue}</p>
                 )}
