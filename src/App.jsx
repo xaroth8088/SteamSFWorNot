@@ -271,11 +271,6 @@ function App() {
         setPhase("start")
     }
 
-    const handleStartGame = async () => {
-        resetRunState()
-        await loadNewGame(appList)
-    }
-
     const handleDontKnow = () => {
         if (phase === "guess") {
             setShowCapsule(true)
@@ -348,13 +343,13 @@ function App() {
         returnToStartScreen()
     }
 
-    const handleSelectMode = (nextMode) => {
-        if (nextMode === gameMode) {
-            return
+    const handleSelectMode = async (nextMode) => {
+        if (nextMode !== gameMode) {
+            setGameMode(nextMode)
         }
 
-        setGameMode(nextMode)
         resetRunState()
+        await loadNewGame(appList)
     }
 
     const accuracyPercent = totalAnswers > 0
@@ -394,7 +389,10 @@ function App() {
                         <span className="start-logo-risky">Not</span>
                     </h1>
                 </div>
-                <p className="start-copy">Office-safe game or HR violation? Separate safe from suspect.</p>
+                <p className="start-copy">
+                    Office-safe game or HR violation?{" "}
+                    <span className="start-copy-break">Separate safe from suspect.</span>
+                </p>
                 <div className="mode-grid">
                     {Object.values(GAME_MODES).map((mode) => {
                         const modeDetails = GAME_MODE_DETAILS[mode]
@@ -414,9 +412,7 @@ function App() {
                 </div>
             </div>
         );
-        buttons = (
-            <button onClick={handleStartGame}>Start Game</button>
-        );
+        buttons = null;
     } else if (phase === "gameover") {
         panelClassName += " is-result";
         mainContent = null;
@@ -447,7 +443,7 @@ function App() {
 
     if (showStableLayout) {
         mainContent = (
-            <>
+            <div className="stable-layout">
                 {phase === "gameover" && (
                     <p className="round-summary">{finalSummaryLabel}: {scoreValue}</p>
                 )}
@@ -498,7 +494,7 @@ function App() {
                         </div>
                     )}
                 </div>
-            </>
+            </div>
         )
     }
 
