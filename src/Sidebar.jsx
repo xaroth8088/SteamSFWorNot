@@ -20,8 +20,12 @@ export default function Sidebar({viewedGames, scoreLabel, scoreValue, isOpen, on
                         aria-expanded={isOpen}
                         aria-controls="viewed-games-list"
                     >
-                        {isOpen ? "Hide" : `Viewed Games (${viewedGames.length})`}
+                        {isOpen ? "Hide" : "Viewed Games"}
                     </button>
+                </div>
+                <div className="sidebar-subheader" aria-live="polite">
+                    <span className="sidebar-subheader-label">Viewed Games</span>
+                    <span className="sidebar-subheader-count">{viewedGames.length}</span>
                 </div>
                 <div className="sidebar-list" id="viewed-games-list">
                     {viewedGames.map((game, index) => (

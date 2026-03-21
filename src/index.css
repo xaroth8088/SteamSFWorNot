@@ -597,6 +597,37 @@ button:focus-visible {
     display: none;
 }
 
+.sidebar-subheader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin: 0 0.9rem 0.35rem;
+    padding: 0.55rem 0.8rem;
+    border-radius: 999px;
+    background: rgba(225, 235, 245, 0.72);
+    border: 1px solid rgba(33, 63, 94, 0.08);
+    color: #36546f;
+}
+
+.sidebar-subheader-label {
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.sidebar-subheader-count {
+    min-width: 1.75rem;
+    padding: 0.22rem 0.45rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.8);
+    font-size: 0.82rem;
+    font-weight: 800;
+    text-align: center;
+    color: #17314d;
+}
+
 .sidebar-list {
     overflow-y: auto;
 }
@@ -841,7 +872,7 @@ button:focus-visible {
     }
 
     .sidebar-list {
-        max-height: calc(80vh - 6.5rem);
+        max-height: calc(80vh - 9.5rem);
         padding-top: 0.25rem;
     }
 
